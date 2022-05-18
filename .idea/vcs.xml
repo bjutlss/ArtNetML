@@ -2,7 +2,5 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/Torchscripted/RandLA-Net-pytorch" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/ffb6d/models/Torchscripted/RandLA-Net-pytorch" vcs="Git" />
   </component>
 </project>
