@@ -98,7 +98,7 @@ parser.add_argument('-debug', action='store_true')
 parser.add_argument('--local_rank', type=int, default=0)
 parser.add_argument('--gpu_id', type=list, default=[0, 1, 2, 3, 4, 5, 6, 7])
 parser.add_argument('-n', '--nodes', default=1, type=int, metavar='N')
-parser.add_argument('-g', '--gpus', default=2, type=int,
+parser.add_argument('-g', '--gpus', default=8, type=int,
                     help='number of gpus per node')
 parser.add_argument('-nr', '--nr', default=0, type=int,
                     help='ranking within the nodes')
@@ -118,7 +118,7 @@ bs_utils = Basic_Utils(config)
 writer = SummaryWriter(log_dir=config.log_traininfo_dir)
 
 rlimit = resource.getrlimit(resource.RLIMIT_NOFILE)
-resource.setrlimit(resource.RLIMIT_NOFILE, (20000, rlimit[1]))
+resource.setrlimit(resource.RLIMIT_NOFILE, (30000, rlimit[1]))
 
 color_lst = [(0, 0, 0)]
 for i in range(config.n_objects):
@@ -697,7 +697,5 @@ def train():
 
 
 if __name__ == "__main__":
-    print("starttraining")
     args.world_size = args.gpus * args.nodes
-
     train()
