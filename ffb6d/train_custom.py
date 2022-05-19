@@ -110,7 +110,7 @@ parser.add_argument('--opt_level', default="O1", type=str,
 args = parser.parse_args()
 
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.local_rank)
-os.environ['CUDA_LAUNCH_BLOCKING'] = 1
+os.environ['CUDA_LAUNCH_BLOCKING'] = str(1)
 torch.cuda.set_device(0)
 device = torch.device('cuda:{}'.format(0))
 
