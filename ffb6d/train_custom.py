@@ -109,7 +109,10 @@ parser.add_argument('--opt_level', default="O1", type=str,
                     help='opt level of apex mix presision trainig.')
 args = parser.parse_args()
 
-os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
+os.environ['CUDA_VISIBLE_DEVICES'] = str(args.local_rank)
+torch.cuda.set_device(0)
+device = torch.device('cuda:{}'.format(0))
+
 
 config = Config(ds_name='custom', cls_type=args.cls)
 bs_utils = Basic_Utils(config)
@@ -625,7 +628,7 @@ def train():
 
     if not args.eval_net:
         model = torch.nn.parallel.DistributedDataParallel(
-            model, device_ids=[args.local_rank], output_device=args.local_rank,
+            model, device_ids=[0], output_device=0,
             find_unused_parameters=True
         )
         clr_div = 2
@@ -693,7 +696,12 @@ def train():
 
 
 if __name__ == "__main__":
-    print("starttraining")
+    print("starttraining")os.environ['CUDA_VISIBLE_DEVICES'] = str(args.local_rank)
+torch.cuda.set_device(0)
+device = torch.device('cuda:{}'.format(0))
+model = torch.nn.parallel.DistributedDataParallel(
+model, device_ids=[0], output_device=0,
+find_unused_parameters=True)
     args.world_size = args.gpus * args.nodes
 
     train()
