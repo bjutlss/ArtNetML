@@ -109,14 +109,14 @@ parser.add_argument('--opt_level', default="O1", type=str,
                     help='opt level of apex mix presision trainig.')
 args = parser.parse_args()
 
-os.environ['CUDA_VISIBLE_DEVICES'] = str(args.local_rank)
+os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 
 config = Config(ds_name='custom', cls_type=args.cls)
 bs_utils = Basic_Utils(config)
 writer = SummaryWriter(log_dir=config.log_traininfo_dir)
 
 rlimit = resource.getrlimit(resource.RLIMIT_NOFILE)
-resource.setrlimit(resource.RLIMIT_NOFILE, (25000, rlimit[1]))
+resource.setrlimit(resource.RLIMIT_NOFILE, (20000, rlimit[1]))
 
 color_lst = [(0, 0, 0)]
 for i in range(config.n_objects):
@@ -127,6 +127,8 @@ for i in range(config.n_objects):
 
 lr_clip = 1e-5
 bnm_clip = 1e-2
+torch.cuda.empty_cache()
+print("Cache empty")
 
 def worker_init_fn(worker_id):
     np.random.seed(np.random.get_state()[1][0] + worker_id)
@@ -141,7 +143,7 @@ def checkpoint_state(model=None, optimizer=None, best_prec=None, epoch=None, it=
     optim_state = optimizer.state_dict() if optimizer is not None else None
     if model is not None:
         if isinstance(model, torch.nn.DataParallel) or \
-                isinstance(model, torch.nn.parallel.DistributedDataParallel):
+                isinstance(model, torch.nn.parallel.DataParallel):
             model_state = model.module.state_dict()
         else:
             model_state = model.state_dict()
