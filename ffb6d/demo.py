@@ -18,6 +18,7 @@ from common import Config, ConfigRandLA
 from models.ffb6d import FFB6D
 from datasets.ycb.ycb_dataset import Dataset as YCB_Dataset
 from datasets.linemod.linemod_dataset import Dataset as LM_Dataset
+from datasets.custom.custom_dataset import Dataset as CM_Dataset
 from utils.pvn3d_eval_utils_kpls import cal_frame_poses, cal_frame_poses_lm
 from utils.basic_utils import Basic_Utils
 try:
@@ -155,6 +156,9 @@ def main():
     if args.dataset == "ycb":
         test_ds = YCB_Dataset('test')
         obj_id = -1
+    elif args.dataset == "custom":
+        test_ds = CM_Dataset('test', cls_type=args.cls)
+        obj_id = config.custom_obj_dict[args.cls]
     else:
         test_ds = LM_Dataset('test', cls_type=args.cls)
         obj_id = config.lm_obj_dict[args.cls]
