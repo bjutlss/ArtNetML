@@ -22,3 +22,5 @@ termcolor
 gdown
 cython
 ninja
+pybind11[global]
+tensorboardX
