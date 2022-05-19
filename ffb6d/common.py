@@ -12,14 +12,14 @@ def ensure_fd(fd):
 class ConfigRandLA:
     k_n = 16  # KNN
     num_layers = 4  # Number of layers
-    num_points = 1920 * 1440 // 72  # Number of input points
+    num_points = 1920 * 1440 // 24  # Number of input points
     num_classes = 3  # Number of valid classes
-    sub_grid_size = 0.04  # preprocess_parameter def: 0.06
+    sub_grid_size = 0.06  # preprocess_parameter def: 0.06
 
-    batch_size = 1  # batch_size during training
-    val_batch_size = 1  # batch_size during validation and test
-    train_steps = 100  # Number of steps per epochs
-    val_steps = 20  # Number of validation steps per epoch
+    batch_size = 3  # batch_size during training
+    val_batch_size = 3  # batch_size during validation and test
+    train_steps = 500  # Number of steps per epochs
+    val_steps = 100  # Number of validation steps per epoch
     in_c = 9
 
     sub_sampling_ratio = [4, 4, 4, 4]  # sampling ratio of random sampling at each layer
@@ -53,15 +53,15 @@ class Config:
         self.log_traininfo_dir = os.path.join(self.log_dir, 'train_info', self.cls_type)
         ensure_fd(self.log_traininfo_dir)
 
-        self.n_total_epoch = 50
-        self.mini_batch_size = 2
-        self.val_mini_batch_size = 2
+        self.n_total_epoch = 25
+        self.mini_batch_size = 3
+        self.val_mini_batch_size = 3
         self.test_mini_batch_size = 1
 
         #self.n_sample_points = 480 * 640 // 24  # Number of input points
-        self.n_sample_points = 1440 * 1920 // 72
+        self.n_sample_points = 1440 * 1920 // 24
         self.n_keypoints = 8
-        self.n_min_points = 300
+        self.n_min_points = 400
 
         self.noise_trans = 0.05  # range of the random noise of translation added to the training data
 

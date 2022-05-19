@@ -1,6 +1,6 @@
 h5py
 numpy
-yaml
+pyyaml
 pprint
 enum34
 future
@@ -15,3 +15,5 @@ easydict
 plyfile
 pillow
 glumpy
+pandas
+libjasper-dev
