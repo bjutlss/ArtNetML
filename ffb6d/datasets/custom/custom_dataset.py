@@ -55,6 +55,7 @@ class Dataset():
                 self.root, 'renders/%s/*.pkl' % cls_type
             )
             self.rnd_lst = glob(rnd_img_ptn)
+            print("Fuse path: ", rnd_img_ptn)
             print("render data length: ", len(self.rnd_lst))
             if len(self.rnd_lst) == 0:
                 warning = "Warning: "
