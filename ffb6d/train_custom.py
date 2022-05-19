@@ -17,6 +17,8 @@ import pickle as pkl
 from collections import namedtuple
 from cv2 import imshow, waitKey
 
+import gc
+
 import torch
 import torch.optim as optim
 import torch.optim.lr_scheduler as lr_sched
@@ -110,6 +112,7 @@ parser.add_argument('--opt_level', default="O1", type=str,
 args = parser.parse_args()
 
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
+os.environ['LOCAL_RANK'] = args.local_rank
 
 config = Config(ds_name='custom', cls_type=args.cls)
 bs_utils = Basic_Utils(config)
@@ -236,7 +239,6 @@ def model_fn_decorator(
             device = torch.device('cuda:{}'.format(args.local_rank))
             print("HIER DEVICE: ", device)
             for key in data.keys():
-                print("DATA KEY: ", data[key].dtype)
                 if data[key].dtype in [np.float32, np.uint8]:
                     cu_dt[key] = torch.from_numpy(data[key].astype(np.float32)).cuda()
                 elif data[key].dtype in [np.int32, np.uint32]:
