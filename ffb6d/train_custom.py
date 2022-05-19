@@ -102,7 +102,7 @@ parser.add_argument('--epochs', default=2, type=int,
 parser.add_argument('--gpu', type=str, default="0,1,2,3,4,5,6,7")
 parser.add_argument('--deterministic', action='store_true')
 parser.add_argument('--keep_batchnorm_fp32', default=True)
-parser.add_argument('--opt_level', default="O1", type=str,
+parser.add_argument('--opt_level', default="O3", type=str,
                     help='opt level of apex mix presision trainig.')
 args = parser.parse_args()
 
@@ -112,8 +112,10 @@ config = Config(ds_name='custom', cls_type=args.cls)
 bs_utils = Basic_Utils(config)
 writer = SummaryWriter(log_dir=config.log_traininfo_dir)
 
+PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:
 rlimit = resource.getrlimit(resource.RLIMIT_NOFILE)
-resource.setrlimit(resource.RLIMIT_NOFILE, (30000, rlimit[1]))
+resource.setrlimit(resource.RLIMIT_NOFILE, (20000, rlimit[1]))
+torch.cuda.empty_cache()
 
 color_lst = [(0, 0, 0)]
 for i in range(config.n_objects):
