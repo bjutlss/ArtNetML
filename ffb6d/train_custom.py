@@ -555,7 +555,8 @@ def train():
         cudnn.deterministic = True
         torch.manual_seed(args.local_rank)
         torch.set_printoptions(precision=10)
-    torch.cuda.set_device(args.local_rank)
+    torch.cuda.set_device(0)
+    device = torch.device('cuda:{}'.format(0))
     torch.distributed.init_process_group(
         backend='nccl',
         init_method='env://',
@@ -622,7 +623,7 @@ def train():
 
     if not args.eval_net:
         model = torch.nn.parallel.DistributedDataParallel(
-            model, device_ids=[args.local_rank], output_device=args.local_rank,
+            model, device_ids=[0], output_device=0,
             find_unused_parameters=True
         )
         clr_div = 2
