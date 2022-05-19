@@ -112,7 +112,6 @@ config = Config(ds_name='custom', cls_type=args.cls)
 bs_utils = Basic_Utils(config)
 writer = SummaryWriter(log_dir=config.log_traininfo_dir)
 
-PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:
 rlimit = resource.getrlimit(resource.RLIMIT_NOFILE)
 resource.setrlimit(resource.RLIMIT_NOFILE, (20000, rlimit[1]))
 torch.cuda.empty_cache()
