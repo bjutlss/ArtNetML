@@ -66,7 +66,6 @@ class Config:
         self.noise_trans = 0.05  # range of the random noise of translation added to the training data
 
         self.preprocessed_testset_pth = ''
-        self.dataset_name == 'custom':
         self.n_objects = 1 + 1  # 1 object + background
         self.n_classes = self.n_objects
         self.custom_cls_lst = [
