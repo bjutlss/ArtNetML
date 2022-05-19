@@ -112,7 +112,6 @@ parser.add_argument('--opt_level', default="O1", type=str,
 args = parser.parse_args()
 
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
-os.environ['LOCAL_RANK'] = args.local_rank
 
 config = Config(ds_name='custom', cls_type=args.cls)
 bs_utils = Basic_Utils(config)
