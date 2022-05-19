@@ -1,2 +1,4 @@
 Linemod_preprocessed
+custom_preprocessed/*
 __pycache__
+wget-log
