@@ -233,8 +233,10 @@ def model_fn_decorator(
             model.eval()
         with torch.set_grad_enabled(not is_eval):
             cu_dt = {}
-            # device = torch.device('cuda:{}'.format(args.local_rank))
+            device = torch.device('cuda:{}'.format(args.local_rank))
+            print("HIER DEVICE: ", device)
             for key in data.keys():
+                print("DATA KEY: ", data[key].dtype)
                 if data[key].dtype in [np.float32, np.uint8]:
                     cu_dt[key] = torch.from_numpy(data[key].astype(np.float32)).cuda()
                 elif data[key].dtype in [np.int32, np.uint32]:
