@@ -21,7 +21,7 @@ class FFB6D(nn.Module):
         self.n_cls = n_classes
         self.n_pts = n_pts
         self.n_kps = n_kps
-        cnn = psp_models['resnet34'.lower()]()
+        cnn = psp_models['resnet18'.lower()]()
 
         rndla = RandLANet(rndla_cfg)
 
