@@ -110,17 +110,13 @@ parser.add_argument('--opt_level', default="O1", type=str,
 args = parser.parse_args()
 
 os.environ['CUDA_VISIBLE_DEVICES'] = str(args.local_rank)
-os.environ['CUDA_LAUNCH_BLOCKING'] = str(1)
-torch.cuda.set_device(0)
-device = torch.device('cuda:{}'.format(0))
-
 
 config = Config(ds_name='custom', cls_type=args.cls)
 bs_utils = Basic_Utils(config)
 writer = SummaryWriter(log_dir=config.log_traininfo_dir)
 
 rlimit = resource.getrlimit(resource.RLIMIT_NOFILE)
-resource.setrlimit(resource.RLIMIT_NOFILE, (30000, rlimit[1]))
+resource.setrlimit(resource.RLIMIT_NOFILE, (25000, rlimit[1]))
 
 color_lst = [(0, 0, 0)]
 for i in range(config.n_objects):
@@ -629,7 +625,7 @@ def train():
 
     if not args.eval_net:
         model = torch.nn.parallel.DistributedDataParallel(
-            model, device_ids=[0], output_device=0,
+            model, device_ids=[args.local_rank], output_device=args.local_rank,
             find_unused_parameters=True
         )
         clr_div = 2
