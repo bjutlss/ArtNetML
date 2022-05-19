@@ -113,7 +113,7 @@ bs_utils = Basic_Utils(config)
 writer = SummaryWriter(log_dir=config.log_traininfo_dir)
 
 rlimit = resource.getrlimit(resource.RLIMIT_NOFILE)
-resource.setrlimit(resource.RLIMIT_NOFILE, (20000, rlimit[1]))
+resource.setrlimit(resource.RLIMIT_NOFILE, (30000, rlimit[1]))
 
 
 color_lst = [(0, 0, 0)]
@@ -230,7 +230,6 @@ def model_fn_decorator(
             model.eval()
         with torch.set_grad_enabled(not is_eval):
             cu_dt = {}
-            # device = torch.device('cuda:{}'.format(args.local_rank))
             for key in data.keys():
                 if data[key].dtype in [np.float32, np.uint8]:
                     cu_dt[key] = torch.from_numpy(data[key].astype(np.float32)).cuda()
@@ -555,8 +554,7 @@ def train():
         cudnn.deterministic = True
         torch.manual_seed(args.local_rank)
         torch.set_printoptions(precision=10)
-    torch.cuda.set_device(0)
-    device = torch.device('cuda:{}'.format(0))
+    torch.cuda.set_device(args.local_rank)
     torch.distributed.init_process_group(
         backend='nccl',
         init_method='env://',
@@ -623,7 +621,7 @@ def train():
 
     if not args.eval_net:
         model = torch.nn.parallel.DistributedDataParallel(
-            model, device_ids=[0], output_device=0,
+            model, device_ids=[args.local_rank], output_device=args.local_rank,
             find_unused_parameters=True
         )
         clr_div = 2

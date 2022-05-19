@@ -16,8 +16,8 @@ class ConfigRandLA:
     num_classes = 3  # Number of valid classes
     sub_grid_size = 0.06  # preprocess_parameter def: 0.06
 
-    batch_size = 5  # batch_size during training
-    val_batch_size = 5  # batch_size during validation and test
+    batch_size = 2  # batch_size during training
+    val_batch_size = 2  # batch_size during validation and test
     train_steps = 500  # Number of steps per epochs
     val_steps = 200  # Number of validation steps per epoch
     in_c = 9
