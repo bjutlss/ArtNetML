@@ -17,3 +17,8 @@ pillow
 glumpy
 pandas
 libjasper-dev
+scikit-learn
+termcolor
+gdown
+cython
+ninja

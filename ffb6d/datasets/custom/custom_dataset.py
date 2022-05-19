@@ -55,7 +55,6 @@ class Dataset():
                 self.root, 'renders/%s/*.pkl' % cls_type
             )
             self.rnd_lst = glob(rnd_img_ptn)
-            print("Fuse path: ", rnd_img_ptn)
             print("render data length: ", len(self.rnd_lst))
             if len(self.rnd_lst) == 0:
                 warning = "Warning: "
@@ -66,9 +65,7 @@ class Dataset():
             fuse_img_ptn = os.path.join(
                 self.root, 'fuse/%s/*.pkl' % cls_type
             )
-            print("Fuse path: ", fuse_img_ptn)
             self.fuse_lst = glob(fuse_img_ptn)
-            print("Fuse path: ", fuse_img_ptn)
             print("fused data length: ", len(self.fuse_lst))
             if len(self.fuse_lst) == 0:
                 warning = "Warning: "

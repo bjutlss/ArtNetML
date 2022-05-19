@@ -1,5 +1,4 @@
 #!/bin/bash
-
-n_gpu=2
+n_gpu=8
 cls='vase'
-python -m torch.distributed.launch --master_port 33330 --nproc_per_node=$n_gpu train_custom.py --gpus=$n_gpu --cls=$cls
+torchrun --nproc_per_node=$n_gpu train_custom.py --gpus=$n_gpu --cls=$cls
