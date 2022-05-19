@@ -96,7 +96,7 @@ parser.add_argument('-debug', action='store_true')
 parser.add_argument('--local_rank', type=int, default=0)
 parser.add_argument('--gpu_id', type=list, default=[0, 1, 2, 3, 4, 5, 6, 7])
 parser.add_argument('-n', '--nodes', default=1, type=int, metavar='N')
-parser.add_argument('-g', '--gpus', default=1, type=int,
+parser.add_argument('-g', '--gpus', default=2, type=int,
                     help='number of gpus per node')
 parser.add_argument('-nr', '--nr', default=0, type=int,
                     help='ranking within the nodes')
@@ -105,7 +105,7 @@ parser.add_argument('--epochs', default=2, type=int,
 parser.add_argument('--gpu', type=str, default="0,1,2,3,4,5,6,7")
 parser.add_argument('--deterministic', action='store_true')
 parser.add_argument('--keep_batchnorm_fp32', default=True)
-parser.add_argument('--opt_level', default="O1", type=str,
+parser.add_argument('--opt_level', default="O0", type=str,
                     help='opt level of apex mix presision trainig.')
 args = parser.parse_args()
 
@@ -127,8 +127,6 @@ for i in range(config.n_objects):
 
 lr_clip = 1e-5
 bnm_clip = 1e-2
-torch.cuda.empty_cache()
-print("Cache empty")
 
 def worker_init_fn(worker_id):
     np.random.seed(np.random.get_state()[1][0] + worker_id)
@@ -143,7 +141,7 @@ def checkpoint_state(model=None, optimizer=None, best_prec=None, epoch=None, it=
     optim_state = optimizer.state_dict() if optimizer is not None else None
     if model is not None:
         if isinstance(model, torch.nn.DataParallel) or \
-                isinstance(model, torch.nn.parallel.DataParallel):
+                isinstance(model, torch.nn.parallel.DistributedDataParallel):
             model_state = model.module.state_dict()
         else:
             model_state = model.state_dict()
