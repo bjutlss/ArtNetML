@@ -696,12 +696,7 @@ def train():
 
 
 if __name__ == "__main__":
-    print("starttraining")os.environ['CUDA_VISIBLE_DEVICES'] = str(args.local_rank)
-torch.cuda.set_device(0)
-device = torch.device('cuda:{}'.format(0))
-model = torch.nn.parallel.DistributedDataParallel(
-model, device_ids=[0], output_device=0,
-find_unused_parameters=True)
+    print("starttraining")
     args.world_size = args.gpus * args.nodes
 
     train()
