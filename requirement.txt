@@ -16,11 +16,11 @@ plyfile
 pillow
 glumpy
 pandas
-libjasper-dev
 scikit-learn
 termcolor
 gdown
-cython
+Cython
 ninja
-pybind11[global]
 tensorboardX
+
+pybind11[global]

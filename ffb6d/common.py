@@ -16,10 +16,10 @@ class ConfigRandLA:
     num_classes = 3  # Number of valid classes
     sub_grid_size = 0.06  # preprocess_parameter def: 0.06
 
-    batch_size = 1  # batch_size during training
-    val_batch_size = 1  # batch_size during validation and test
-    train_steps = 250  # Number of steps per epochs
-    val_steps = 50  # Number of validation steps per epoch
+    batch_size = 5  # batch_size during training
+    val_batch_size = 5  # batch_size during validation and test
+    train_steps = 500  # Number of steps per epochs
+    val_steps = 200  # Number of validation steps per epoch
     in_c = 9
 
     sub_sampling_ratio = [4, 4, 4, 4]  # sampling ratio of random sampling at each layer
@@ -53,9 +53,9 @@ class Config:
         self.log_traininfo_dir = os.path.join(self.log_dir, 'train_info', self.cls_type)
         ensure_fd(self.log_traininfo_dir)
 
-        self.n_total_epoch = 25
-        self.mini_batch_size = 2
-        self.val_mini_batch_size = 2
+        self.n_total_epoch = 50
+        self.mini_batch_size = 3
+        self.val_mini_batch_size = 3
         self.test_mini_batch_size = 1
 
         #self.n_sample_points = 480 * 640 // 24  # Number of input points
@@ -66,132 +66,50 @@ class Config:
         self.noise_trans = 0.05  # range of the random noise of translation added to the training data
 
         self.preprocessed_testset_pth = ''
-        if self.dataset_name == 'ycb':
-            self.n_objects = 21 + 1  # 21 objects + background
-            self.n_classes = self.n_objects
-            self.use_orbfps = True
-            self.kp_orbfps_dir = 'datasets/ycb/ycb_kps/'
-            self.kp_orbfps_ptn = os.path.join(self.kp_orbfps_dir, '%s_%d_kps.txt')
-            self.ycb_cls_lst_p = os.path.abspath(
-                os.path.join(
-                    self.exp_dir, 'datasets/ycb/dataset_config/classes.txt'
-                )
-            )
-            self.ycb_root = os.path.abspath(
-                os.path.join(
-                    self.exp_dir, 'datasets/ycb/YCB_Video_Dataset'
-                )
-            )
-            self.ycb_kps_dir = os.path.abspath(
-                os.path.join(
-                    self.exp_dir, 'datasets/ycb/ycb_kps/'
-                )
-            )
-            ycb_r_lst_p = os.path.abspath(
-                os.path.join(
-                    self.exp_dir, 'datasets/ycb/dataset_config/radius.txt'
-                )
-            )
-            self.ycb_r_lst = list(np.loadtxt(ycb_r_lst_p))
-            self.ycb_cls_lst = self.read_lines(self.ycb_cls_lst_p)
-            self.ycb_sym_cls_ids = [13, 16, 19, 20, 21]
+        self.dataset_name == 'custom':
+        self.n_objects = 1 + 1  # 1 object + background
+        self.n_classes = self.n_objects
+        self.custom_cls_lst = [
+            1, 2, 3
+        ]
+        self.custom_sym_cls_ids = [3]
+        self.custom_obj_dict = {
+            'vase': 1,
+            'euro': 2,
+            'fruitbasket': 3,
+        }
+        try:
+            self.cls_id = self.custom_obj_dict[cls_type]
+        except Exception:
+            pass
+        self.custom_id2obj_dict = dict(
+            zip(self.custom_obj_dict.values(), self.custom_obj_dict.keys())
+        )
+        self.custom_root = os.path.abspath(self.exp_dir)
 
-        elif self.dataset_name == 'custom':
-            self.n_objects = 1 + 1  # 1 object + background
-            self.n_classes = self.n_objects
-            self.custom_cls_lst = [
-                1, 2, 3
-            ]
-            self.custom_sym_cls_ids = [3]
-            self.custom_obj_dict = {
-                'vase': 1,
-                'euro': 2,
-                'fruitbasket': 3,
-            }
-            try:
-                self.cls_id = self.custom_obj_dict[cls_type]
-            except Exception:
-                pass
-            self.custom_id2obj_dict = dict(
-                zip(self.custom_obj_dict.values(), self.custom_obj_dict.keys())
-            )
-            self.custom_root = os.path.abspath(self.exp_dir)
+        self.use_orbfps = True
+        self.kp_orbfps_dir = 'datasets/custom/kps_orb9_fps/'
+        self.kp_orbfps_ptn = os.path.join(self.kp_orbfps_dir, '%s_%d_kps.txt')
+        # FPS
+        self.custom_fps_kps_dir = os.path.abspath(
+            os.path.join(self.exp_dir, 'datasets/custom/custom_obj_kps/')
+        )
 
-            self.use_orbfps = True
-            self.kp_orbfps_dir = 'datasets/custom/kps_orb9_fps/'
-            self.kp_orbfps_ptn = os.path.join(self.kp_orbfps_dir, '%s_%d_kps.txt')
-            # FPS
-            self.custom_fps_kps_dir = os.path.abspath(
-                os.path.join(self.exp_dir, 'datasets/custom/custom_obj_kps/')
-            )
+        custom_r_pth = os.path.join(self.custom_root, "datasets/custom/dataset_config/models_info.yml")
+        custom_r_file = open(os.path.join(custom_r_pth), "r")
+        self.custom_r_lst = yaml.load(custom_r_file, Loader=yaml.FullLoader)
 
-            custom_r_pth = os.path.join(self.custom_root, "datasets/custom/dataset_config/models_info.yml")
-            custom_r_file = open(os.path.join(custom_r_pth), "r")
-            self.custom_r_lst = yaml.load(custom_r_file, Loader=yaml.FullLoader)
-
-            self.val_nid_ptn = "/data/6D_Pose_Data/datasets/custom/pose_nori_lists/{}_real_val.nori.list"
-
-        else:  # linemod
-            self.n_objects = 1 + 1  # 1 object + background
-            self.n_classes = self.n_objects
-            self.lm_cls_lst = [
-                1, 2, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
-            ]
-            self.lm_sym_cls_ids = [10, 11, 18]
-            self.lm_obj_dict = {
-                'ape': 1,
-                'benchvise': 2,
-                'cam': 4,
-                'can': 5,
-                'cat': 6,
-                'driller': 8,
-                'duck': 9,
-                'eggbox': 10,
-                'glue': 11,
-                'holepuncher': 12,
-                'iron': 13,
-                'lamp': 14,
-                'phone': 15,
-                'vase': 16,
-                'euro': 17,
-                'fruitbasket': 18,
-            }
-            try:
-                self.cls_id = self.lm_obj_dict[cls_type]
-            except Exception:
-                pass
-            self.lm_id2obj_dict = dict(
-                zip(self.lm_obj_dict.values(), self.lm_obj_dict.keys())
-            )
-            self.lm_root = os.path.abspath(self.exp_dir)
-
-            self.use_orbfps = True
-            self.kp_orbfps_dir = 'datasets/linemod/kps_orb9_fps/'
-            self.kp_orbfps_ptn = os.path.join(self.kp_orbfps_dir, '%s_%d_kps.txt')
-            # FPS
-            self.lm_fps_kps_dir = os.path.abspath(
-                os.path.join(self.exp_dir, 'datasets/linemod/lm_obj_kps/')
-            )
-
-            lm_r_pth = os.path.join(self.lm_root, "datasets/linemod/dataset_config/models_info.yml")
-            lm_r_file = open(os.path.join(lm_r_pth), "r")
-            self.lm_r_lst = yaml.load(lm_r_file, Loader=yaml.FullLoader)
-
-            self.val_nid_ptn = "/data/6D_Pose_Data/datasets/LINEMOD/pose_nori_lists/{}_real_val.nori.list"
+        self.val_nid_ptn = "/data/6D_Pose_Data/datasets/custom/pose_nori_lists/{}_real_val.nori.list"
 
         self.intrinsic_matrix = {
-            'linemod': np.array([[1594.7247314453125, 0., 951.2391967773438],
-                                [0., 1594.7247314453125, 722.7899761199951],
-                                [0.,        0.,             1.]]),
+
             'custom': np.array([[1594.7247314453125, 0., 951.2391967773438],
                                  [0., 1594.7247314453125, 722.7899761199951],
                                  [0., 0., 1.]]),
             'blender': np.array([[1594.7247314453125, 0., 951.2391967773438],
                                 [0., 1594.7247314453125, 722.7899761199951],
                                 [0.,        0.,             1.]]),
-            #'blender': np.array([[700., 0., 320.],
-            #                     [0., 700., 240.],
-            #                     [0., 0., 1.]]),
+
             'ycb_K1': np.array([[1066.778, 0.        , 312.9869],
                                 [0.      , 1067.487  , 241.3109],
                                 [0.      , 0.        , 1.0]], np.float32),
