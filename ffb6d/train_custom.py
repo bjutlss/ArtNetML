@@ -17,8 +17,6 @@ import pickle as pkl
 from collections import namedtuple
 from cv2 import imshow, waitKey
 
-import gc
-
 import torch
 import torch.optim as optim
 import torch.optim.lr_scheduler as lr_sched
@@ -26,12 +24,8 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import CyclicLR
 import torch.backends.cudnn as cudnn
-
-from torch.distributed.elastic.multiprocessing.errors import record
-
 from tensorboardX import SummaryWriter
 
-import common
 from common import Config, ConfigRandLA
 import models.pytorch_utils as pt_utils
 from models.ffb6d import FFB6D
@@ -40,7 +34,8 @@ from utils.custom_pvn3d_eval_utils_kpls import TorchEval
 from utils.custom_basic_utils import Basic_Utils
 import datasets.custom.custom_dataset as dataset_desc
 
-from apex.parallel import convert_syncbn_model, DistributedDataParallel
+from apex.parallel import DistributedDataParallel
+from apex.parallel import convert_syncbn_model
 from apex import amp
 from apex.multi_tensor_apply import multi_tensor_applier
 
@@ -81,7 +76,7 @@ parser.add_argument(
     "-eval_net", action='store_true', help="whether is to eval net."
 )
 parser.add_argument(
-    '--cls', type=str, default="vase",
+    '--cls', type=str, default="ape",
     help="Target object. (ape, benchvise, cam, can, cat, driller," +
     "duck, eggbox, glue, holepuncher, iron, lamp, phone)"
 )
@@ -107,7 +102,7 @@ parser.add_argument('--epochs', default=2, type=int,
 parser.add_argument('--gpu', type=str, default="0,1,2,3,4,5,6,7")
 parser.add_argument('--deterministic', action='store_true')
 parser.add_argument('--keep_batchnorm_fp32', default=True)
-parser.add_argument('--opt_level', default="O1", type=str,
+parser.add_argument('--opt_level', default="O0", type=str,
                     help='opt level of apex mix presision trainig.')
 args = parser.parse_args()
 
@@ -129,8 +124,7 @@ for i in range(config.n_objects):
 
 lr_clip = 1e-5
 bnm_clip = 1e-2
-torch.cuda.empty_cache()
-print("Cache empty")
+
 
 def worker_init_fn(worker_id):
     np.random.seed(np.random.get_state()[1][0] + worker_id)
@@ -145,7 +139,7 @@ def checkpoint_state(model=None, optimizer=None, best_prec=None, epoch=None, it=
     optim_state = optimizer.state_dict() if optimizer is not None else None
     if model is not None:
         if isinstance(model, torch.nn.DataParallel) or \
-                isinstance(model, torch.nn.parallel.DataParallel):
+                isinstance(model, torch.nn.parallel.DistributedDataParallel):
             model_state = model.module.state_dict()
         else:
             model_state = model.state_dict()
@@ -235,7 +229,7 @@ def model_fn_decorator(
             model.eval()
         with torch.set_grad_enabled(not is_eval):
             cu_dt = {}
-            device = torch.device('cuda:{}'.format(args.local_rank))
+            # device = torch.device('cuda:{}'.format(args.local_rank))
             for key in data.keys():
                 if data[key].dtype in [np.float32, np.uint8]:
                     cu_dt[key] = torch.from_numpy(data[key].astype(np.float32)).cuda()
@@ -332,7 +326,6 @@ def model_fn_decorator(
 class Trainer(object):
     r"""
         Reasonably generic trainer for pytorch models
-
     Parameters
     ----------
     model : pytorch model
@@ -440,7 +433,6 @@ class Trainer(object):
     ):
         r"""
            Call to begin training the model
-
         Parameters
         ----------
         start_epoch : int
@@ -553,7 +545,7 @@ class Trainer(object):
                 writer.close()
         return best_loss
 
-@record
+
 def train():
     print("local_rank:", args.local_rank)
     cudnn.benchmark = True

@@ -16,10 +16,10 @@ class ConfigRandLA:
     num_classes = 3  # Number of valid classes
     sub_grid_size = 0.06  # preprocess_parameter def: 0.06
 
-    batch_size = 3  # batch_size during training
-    val_batch_size = 3  # batch_size during validation and test
-    train_steps = 500  # Number of steps per epochs
-    val_steps = 100  # Number of validation steps per epoch
+    batch_size = 1  # batch_size during training
+    val_batch_size = 1  # batch_size during validation and test
+    train_steps = 250  # Number of steps per epochs
+    val_steps = 50  # Number of validation steps per epoch
     in_c = 9
 
     sub_sampling_ratio = [4, 4, 4, 4]  # sampling ratio of random sampling at each layer
@@ -54,8 +54,8 @@ class Config:
         ensure_fd(self.log_traininfo_dir)
 
         self.n_total_epoch = 25
-        self.mini_batch_size = 3
-        self.val_mini_batch_size = 3
+        self.mini_batch_size = 2
+        self.val_mini_batch_size = 2
         self.test_mini_batch_size = 1
 
         #self.n_sample_points = 480 * 640 // 24  # Number of input points
