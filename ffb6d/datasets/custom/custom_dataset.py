@@ -199,7 +199,6 @@ class Dataset():
         return dpt_3d
 
     def get_item(self, item_name):
-        print("Train data no.: ", item_name)
         if "pkl" in item_name:
             data = pkl.load(open(item_name, "rb"))
             dpt_mm = data['depth'] * 1000.
