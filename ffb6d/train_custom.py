@@ -70,13 +70,13 @@ parser.add_argument(
     help="Checkpoint to start from"
 )
 parser.add_argument(
-    "-epochs", type=int, default=1000, help="Number of epochs to train for"
+    "-epochs", type=int, default=500, help="Number of epochs to train for"
 )
 parser.add_argument(
     "-eval_net", action='store_true', help="whether is to eval net."
 )
 parser.add_argument(
-    '--cls', type=str, default="ape",
+    '--cls', type=str, default="vase",
     help="Target object. (ape, benchvise, cam, can, cat, driller," +
     "duck, eggbox, glue, holepuncher, iron, lamp, phone)"
 )
