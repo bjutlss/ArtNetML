@@ -36,7 +36,7 @@ import datasets.custom.custom_dataset as dataset_desc
 
 from apex.parallel import DistributedDataParallel
 from apex.parallel import convert_syncbn_model
-from torch.cuda import amp
+from apex import amp
 from apex.multi_tensor_apply import multi_tensor_applier
 
 
@@ -102,7 +102,7 @@ parser.add_argument('--epochs', default=2, type=int,
 parser.add_argument('--gpu', type=str, default="0,1,2,3")
 parser.add_argument('--deterministic', action='store_true')
 parser.add_argument('--keep_batchnorm_fp32', default=True)
-parser.add_argument('--opt_level', default="O1", type=str,
+parser.add_argument('--opt_level', default="O2", type=str,
                     help='opt level of apex mix precision training.')
 args = parser.parse_args()
 
@@ -113,7 +113,7 @@ bs_utils = Basic_Utils(config)
 writer = SummaryWriter(log_dir=config.log_traininfo_dir)
 
 rlimit = resource.getrlimit(resource.RLIMIT_NOFILE)
-resource.setrlimit(resource.RLIMIT_NOFILE, (30000, rlimit[1]))
+resource.setrlimit(resource.RLIMIT_NOFILE, (40000, rlimit[1]))
 
 
 color_lst = [(0, 0, 0)]
