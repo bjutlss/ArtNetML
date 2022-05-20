@@ -39,6 +39,7 @@ from apex.parallel import convert_syncbn_model
 from apex import amp
 from apex.multi_tensor_apply import multi_tensor_applier
 
+
 parser = argparse.ArgumentParser(description="Arg parser")
 parser.add_argument(
     "-weight_decay", type=float, default=0,
@@ -75,7 +76,7 @@ parser.add_argument(
     "-eval_net", action='store_true', help="whether is to eval net."
 )
 parser.add_argument(
-    '--cls', type=str, default="vase",
+    '--cls', type=str, default="ape",
     help="Target object. (ape, benchvise, cam, can, cat, driller," +
     "duck, eggbox, glue, holepuncher, iron, lamp, phone)"
 )
@@ -90,15 +91,15 @@ parser.add_argument("-view_dpt", action="store_true")
 parser.add_argument('-debug', action='store_true')
 
 parser.add_argument('--local_rank', type=int, default=0)
-parser.add_argument('--gpu_id', type=list, default=[0, 1, 2, 3, 4])
+parser.add_argument('--gpu_id', type=list, default=[0, 1, 2, 3])
 parser.add_argument('-n', '--nodes', default=1, type=int, metavar='N')
-parser.add_argument('-g', '--gpus', default=1, type=int,
+parser.add_argument('-g', '--gpus', default=4, type=int,
                     help='number of gpus per node')
 parser.add_argument('-nr', '--nr', default=0, type=int,
                     help='ranking within the nodes')
 parser.add_argument('--epochs', default=2, type=int,
                     metavar='N', help='number of total epochs to run')
-parser.add_argument('--gpu', type=str, default="0,1,2,3,4")
+parser.add_argument('--gpu', type=str, default="0,1,2,3")
 parser.add_argument('--deterministic', action='store_true')
 parser.add_argument('--keep_batchnorm_fp32', default=True)
 parser.add_argument('--opt_level', default="O1", type=str,
@@ -565,20 +566,20 @@ def train():
         train_sampler = torch.utils.data.distributed.DistributedSampler(train_ds)
         train_loader = torch.utils.data.DataLoader(
             train_ds, batch_size=config.mini_batch_size, shuffle=False,
-            drop_last=True, num_workers=4, sampler=train_sampler, pin_memory=True
+            drop_last=True, num_workers=2, sampler=train_sampler, pin_memory=True
         )
 
         val_ds = dataset_desc.Dataset('test', cls_type=args.cls)
         val_sampler = torch.utils.data.distributed.DistributedSampler(val_ds)
         val_loader = torch.utils.data.DataLoader(
             val_ds, batch_size=config.val_mini_batch_size, shuffle=False,
-            drop_last=False, num_workers=4, sampler=val_sampler
+            drop_last=False, num_workers=2, sampler=val_sampler
         )
     else:
         test_ds = dataset_desc.Dataset('test', cls_type=args.cls)
         test_loader = torch.utils.data.DataLoader(
             test_ds, batch_size=config.test_mini_batch_size, shuffle=False,
-            num_workers=10
+            num_workers=6
         )
 
     rndla_cfg = ConfigRandLA
