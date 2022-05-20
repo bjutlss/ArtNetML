@@ -288,7 +288,7 @@ def model_fn_decorator(
             info_dict = loss_dict.copy()
             info_dict.update(acc_dict)
 
-            if not is_eval:
+            #if not is_eval:
                 #if args.local_rank == 0:
                     #writer.add_scalars('loss', loss_dict, it)
                     #writer.add_scalars('train_acc', acc_dict, it)
