@@ -109,7 +109,10 @@ class Dataset():
         n = len(self.real_lst)
         idx = self.rng.randint(0, n)
         item = self.real_lst[idx]
-        return item
+        if item != "":
+            return item
+        else:
+            self.real_gen()
 
     def rand_range(self, rng, lo, hi):
         return rng.rand()*(hi-lo)+lo
