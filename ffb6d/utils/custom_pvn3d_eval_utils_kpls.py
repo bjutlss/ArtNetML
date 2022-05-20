@@ -281,8 +281,7 @@ def cal_frame_poses_custom(pcld, mask, ctr_of, pred_kp_of, use_ctr, n_cls, use_c
     return pred_pose_lst
 
 
-def eval_metric_custom\
-                (cls_ids, pred_pose_lst, RTs, mask, label, obj_id):
+def eval_metric_custom(cls_ids, pred_pose_lst, RTs, mask, label, obj_id):
     n_cls = config.n_classes
     cls_add_dis = [list() for i in range(n_cls)]
     cls_adds_dis = [list() for i in range(n_cls)]
