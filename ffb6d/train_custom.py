@@ -93,17 +93,17 @@ parser.add_argument('-debug', action='store_true')
 parser.add_argument('--local_rank', type=int, default=0)
 parser.add_argument('--gpu_id', type=list, default=[0, 1, 2, 3, 4, 5, 6, 7])
 parser.add_argument('-n', '--nodes', default=1, type=int, metavar='N')
-parser.add_argument('-g', '--gpus', default=8, type=int,
+parser.add_argument('-g', '--gpus', default=4, type=int,
                     help='number of gpus per node')
 parser.add_argument('-nr', '--nr', default=0, type=int,
                     help='ranking within the nodes')
 parser.add_argument('--epochs', default=2, type=int,
                     metavar='N', help='number of total epochs to run')
-parser.add_argument('--gpu', type=str, default="0,1,2,3,4,5,6,7")
+parser.add_argument('--gpu', type=str, default="0,1,2,3")
 parser.add_argument('--deterministic', action='store_true')
 parser.add_argument('--keep_batchnorm_fp32', default=True)
 parser.add_argument('--opt_level', default="O1", type=str,
-                    help='opt level of apex mix presision trainig.')
+                    help='opt level of apex mix precision training.')
 args = parser.parse_args()
 
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
@@ -566,20 +566,20 @@ def train():
         train_sampler = torch.utils.data.distributed.DistributedSampler(train_ds)
         train_loader = torch.utils.data.DataLoader(
             train_ds, batch_size=config.mini_batch_size, shuffle=False,
-            drop_last=True, num_workers=3, sampler=train_sampler, pin_memory=True
+            drop_last=True, num_workers=4, sampler=train_sampler, pin_memory=True
         )
 
         val_ds = dataset_desc.Dataset('test', cls_type=args.cls)
         val_sampler = torch.utils.data.distributed.DistributedSampler(val_ds)
         val_loader = torch.utils.data.DataLoader(
             val_ds, batch_size=config.val_mini_batch_size, shuffle=False,
-            drop_last=False, num_workers=3, sampler=val_sampler
+            drop_last=False, num_workers=4, sampler=val_sampler
         )
     else:
         test_ds = dataset_desc.Dataset('test', cls_type=args.cls)
         test_loader = torch.utils.data.DataLoader(
             test_ds, batch_size=config.test_mini_batch_size, shuffle=False,
-            num_workers=8
+            num_workers=10
         )
 
     rndla_cfg = ConfigRandLA
