@@ -75,7 +75,7 @@ parser.add_argument(
     "-eval_net", action='store_true', help="whether is to eval net."
 )
 parser.add_argument(
-    '--cls', type=str, default="ape",
+    '--cls', type=str, default="vase",
     help="Target object. (ape, benchvise, cam, can, cat, driller," +
     "duck, eggbox, glue, holepuncher, iron, lamp, phone)"
 )
@@ -92,7 +92,7 @@ parser.add_argument('-debug', action='store_true')
 parser.add_argument('--local_rank', type=int, default=0)
 parser.add_argument('--gpu_id', type=list, default=[0, 1, 2, 3, 4])
 parser.add_argument('-n', '--nodes', default=1, type=int, metavar='N')
-parser.add_argument('-g', '--gpus', default=4, type=int,
+parser.add_argument('-g', '--gpus', default=1, type=int,
                     help='number of gpus per node')
 parser.add_argument('-nr', '--nr', default=0, type=int,
                     help='ranking within the nodes')
