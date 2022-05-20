@@ -24,7 +24,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import CyclicLR
 import torch.backends.cudnn as cudnn
-from tensorboardX import SummaryWriter
+#from tensorboardX import SummaryWriter
 
 from common import Config, ConfigRandLA
 import models.pytorch_utils as pt_utils
@@ -112,7 +112,7 @@ os.environ['NCCL_DEBUG'] = "WARN"
 config = Config(ds_name='custom', cls_type=args.cls)
 bs_utils = Basic_Utils(config)
 
-writer = SummaryWriter(log_dir=config.log_traininfo_dir)
+#writer = SummaryWriter(log_dir=config.log_traininfo_dir)
 
 rlimit = resource.getrlimit(resource.RLIMIT_NOFILE)
 resource.setrlimit(resource.RLIMIT_NOFILE, (30000, rlimit[1]))
@@ -289,9 +289,9 @@ def model_fn_decorator(
             info_dict.update(acc_dict)
 
             if not is_eval:
-                if args.local_rank == 0:
-                    writer.add_scalars('loss', loss_dict, it)
-                    writer.add_scalars('train_acc', acc_dict, it)
+                #if args.local_rank == 0:
+                    #writer.add_scalars('loss', loss_dict, it)
+                    #writer.add_scalars('train_acc', acc_dict, it)
             if is_test and test_pose:
                 cld = cu_dt['cld_rgb_nrm'][:, :3, :].permute(0, 2, 1).contiguous()
 
@@ -415,9 +415,9 @@ class Trainer(object):
             with open(os.path.join(config.log_eval_dir, seg_res_fn), 'w') as of:
                 for k, v in acc_dict.items():
                     print(k, v, file=of)
-        if args.local_rank == 0:
-            for i, val in enumerate(acc_dict):
-                writer.add_scalar('val_acc', scalar_value=val, global_step=i)
+        #if args.local_rank == 0:
+            #for i, val in enumerate(acc_dict):
+                #writer.add_scalar('val_acc', scalar_value=val, global_step=i)
             #writer.add_scalars('val_acc', acc_dict, it)
 
         return total_loss / count, eval_dict
@@ -490,8 +490,8 @@ class Trainer(object):
                     with amp.scale_loss(loss, self.optimizer) as scaled_loss:
                         scaled_loss.backward()
                     lr = get_lr(self.optimizer)
-                    if args.local_rank == 0:
-                        writer.add_scalar('lr/lr', lr, it)
+                    #if args.local_rank == 0:
+                        #writer.add_scalar('lr/lr', lr, it)
 
                     self.optimizer.step()
 
@@ -544,9 +544,9 @@ class Trainer(object):
                         )
                         pbar.set_postfix(dict(total_it=it))
 
-            if args.local_rank == 0:
-                writer.export_scalars_to_json("./all_scalars.json")
-                writer.close()
+            #if args.local_rank == 0:
+                #writer.export_scalars_to_json("./all_scalars.json")
+                #writer.close()
         return best_loss
 
 
