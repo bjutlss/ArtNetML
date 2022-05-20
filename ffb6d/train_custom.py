@@ -36,7 +36,7 @@ import datasets.custom.custom_dataset as dataset_desc
 
 from apex.parallel import DistributedDataParallel
 from apex.parallel import convert_syncbn_model
-from apex import amp
+from torch.cuda import amp
 from apex.multi_tensor_apply import multi_tensor_applier
 
 
