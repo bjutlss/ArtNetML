@@ -93,7 +93,7 @@ parser.add_argument('-debug', action='store_true')
 parser.add_argument('--local_rank', type=int, default=0)
 parser.add_argument('--gpu_id', type=list, default=[0, 1, 2, 3, 4, 5, 6, 7])
 parser.add_argument('-n', '--nodes', default=1, type=int, metavar='N')
-parser.add_argument('-g', '--gpus', default=4, type=int,
+parser.add_argument('-g', '--gpus', default=8, type=int,
                     help='number of gpus per node')
 parser.add_argument('-nr', '--nr', default=0, type=int,
                     help='ranking within the nodes')
@@ -102,15 +102,16 @@ parser.add_argument('--epochs', default=2, type=int,
 parser.add_argument('--gpu', type=str, default="0,1,2,3,4,5,6,7")
 parser.add_argument('--deterministic', action='store_true')
 parser.add_argument('--keep_batchnorm_fp32', default=True)
-parser.add_argument('--opt_level', default="O2", type=str,
+parser.add_argument('--opt_level', default="O1", type=str,
                     help='opt level of apex mix presision trainig.')
 args = parser.parse_args()
 
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
+os.environ['NCCL_DEBUG'] = "WARN"
 
 config = Config(ds_name='custom', cls_type=args.cls)
 bs_utils = Basic_Utils(config)
-writer = SummaryWriter(log_dir=config.log_traininfo_dir)
+#writer = SummaryWriter(log_dir=config.log_traininfo_dir)
 
 rlimit = resource.getrlimit(resource.RLIMIT_NOFILE)
 resource.setrlimit(resource.RLIMIT_NOFILE, (30000, rlimit[1]))

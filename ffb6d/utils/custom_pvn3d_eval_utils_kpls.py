@@ -314,15 +314,15 @@ def eval_one_frame_pose_custom(item):
     )
     return (cls_add_dis, cls_adds_dis)
 
-# ###############################End custom Evaluation###############################
+# ############################### End custom Evaluation###############################
 
 
-# ###############################Shared Evaluation Entry###############################
+# ############################### Shared Evaluation Entry###############################
 class TorchEval():
 
     def __init__(self):
-        n_cls = 22
-        self.n_cls = 22
+        n_cls = 3
+        self.n_cls = 3
         self.cls_add_dis = [list() for i in range(n_cls)]
         self.cls_adds_dis = [list() for i in range(n_cls)]
         self.cls_add_s_dis = [list() for i in range(n_cls)]
