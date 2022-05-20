@@ -111,7 +111,8 @@ os.environ['NCCL_DEBUG'] = "WARN"
 
 config = Config(ds_name='custom', cls_type=args.cls)
 bs_utils = Basic_Utils(config)
-#writer = SummaryWriter(log_dir=config.log_traininfo_dir)
+
+writer = SummaryWriter(log_dir=config.log_traininfo_dir)
 
 rlimit = resource.getrlimit(resource.RLIMIT_NOFILE)
 resource.setrlimit(resource.RLIMIT_NOFILE, (30000, rlimit[1]))
@@ -415,7 +416,9 @@ class Trainer(object):
                 for k, v in acc_dict.items():
                     print(k, v, file=of)
         if args.local_rank == 0:
-            writer.add_scalars('val_acc', acc_dict, it)
+            for i, val in enumerate(acc_dict):
+                writer.add_scalar('val_acc', scalar_value=val, global_step=i)
+            #writer.add_scalars('val_acc', acc_dict, it)
 
         return total_loss / count, eval_dict
 
