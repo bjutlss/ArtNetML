@@ -39,8 +39,6 @@ from apex.parallel import convert_syncbn_model
 from apex import amp
 from apex.multi_tensor_apply import multi_tensor_applier
 
-torch.cuda.empty_cache()
-
 parser = argparse.ArgumentParser(description="Arg parser")
 parser.add_argument(
     "-weight_decay", type=float, default=0,
@@ -92,7 +90,7 @@ parser.add_argument("-view_dpt", action="store_true")
 parser.add_argument('-debug', action='store_true')
 
 parser.add_argument('--local_rank', type=int, default=0)
-parser.add_argument('--gpu_id', type=list, default=[0, 1, 2, 3])
+parser.add_argument('--gpu_id', type=list, default=[0, 1, 2, 3, 4])
 parser.add_argument('-n', '--nodes', default=1, type=int, metavar='N')
 parser.add_argument('-g', '--gpus', default=4, type=int,
                     help='number of gpus per node')
@@ -100,7 +98,7 @@ parser.add_argument('-nr', '--nr', default=0, type=int,
                     help='ranking within the nodes')
 parser.add_argument('--epochs', default=2, type=int,
                     metavar='N', help='number of total epochs to run')
-parser.add_argument('--gpu', type=str, default="0,1,2,3")
+parser.add_argument('--gpu', type=str, default="0,1,2,3,4")
 parser.add_argument('--deterministic', action='store_true')
 parser.add_argument('--keep_batchnorm_fp32', default=True)
 parser.add_argument('--opt_level', default="O1", type=str,
@@ -114,7 +112,7 @@ bs_utils = Basic_Utils(config)
 writer = SummaryWriter(log_dir=config.log_traininfo_dir)
 
 rlimit = resource.getrlimit(resource.RLIMIT_NOFILE)
-resource.setrlimit(resource.RLIMIT_NOFILE, (40000, rlimit[1]))
+resource.setrlimit(resource.RLIMIT_NOFILE, (30000, rlimit[1]))
 
 
 color_lst = [(0, 0, 0)]
