@@ -1,4 +1,4 @@
 #!/bin/bash
-n_gpu=1
+n_gpu=4
 cls='vase'
-python -m torch.distributed.launch --nproc_per_node=1 train_custom.py --gpu "0" --gpus 1 --local_rank "0"
+python3 -m torch.distributed.launch --nproc_per_node=$n_gpu train_custom.py --gpus=$n_gpu --cls=$cls
