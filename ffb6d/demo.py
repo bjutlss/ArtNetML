@@ -140,7 +140,7 @@ def main():
     obj_id = config.custom_obj_dict[args.cls]
     test_loader = torch.utils.data.DataLoader(
         test_ds, batch_size=config.test_mini_batch_size, shuffle=False,
-        num_workers=20
+        num_workers=16
     )
 
     rndla_cfg = ConfigRandLA
