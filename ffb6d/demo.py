@@ -153,18 +153,11 @@ def cal_view_pred_pose(model, data, epoch=0, obj_id=-1):
 
 
 def main():
-    if args.dataset == "ycb":
-        test_ds = YCB_Dataset('test')
-        obj_id = -1
-    elif args.dataset == "custom":
-        test_ds = CM_Dataset('test', cls_type=args.cls)
-        obj_id = config.custom_obj_dict[args.cls]
-    else:
-        test_ds = LM_Dataset('test', cls_type=args.cls)
-        obj_id = config.lm_obj_dict[args.cls]
+    test_ds = CM_Dataset('test', cls_type=args.cls)
+    obj_id = config.custom_obj_dict[args.cls]
     test_loader = torch.utils.data.DataLoader(
         test_ds, batch_size=config.test_mini_batch_size, shuffle=False,
-        num_workers=20
+        num_workers=16
     )
 
     rndla_cfg = ConfigRandLA
