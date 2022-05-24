@@ -447,6 +447,7 @@ class Dataset():
 
 
 def main():
+
     # config.mini_batch_size = 1
     ds = {}
     cls = 'vase'
@@ -457,9 +458,8 @@ def main():
         val=0,
         test=0
     )
+
     while True:
-        # for cat in ['val', 'test']:
-        # for cat in ['test']:
         for cat in ['train']:
             datum = ds[cat].__getitem__(idx[cat])
             idx[cat] += 1
@@ -482,6 +482,8 @@ def main():
                 rgb = ds[cat].bs_utils.draw_p2ds(
                     rgb, ctr_2ds, 4, (0, 0, 255)
                 )
+            
+            
             imS = cv2.resize(rgb, (720,960))
             imshow('{}_rgb'.format(cat), imS)
             cmd = waitKey(0)

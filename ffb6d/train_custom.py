@@ -81,6 +81,9 @@ parser.add_argument(
     "-eval_net", action='store_true', help="whether is to eval net."
 )
 parser.add_argument(
+    "-script_net", action='store_true', help="whether is to torch script the network."
+)
+parser.add_argument(
     '--cls', type=str, default="vase",
     help="Target object. (ape, benchvise, cam, can, cat, driller," +
     "duck, eggbox, glue, holepuncher, iron, lamp, phone)"
@@ -569,7 +572,35 @@ def train():
     )
     torch.manual_seed(0)
 
-    if not args.eval_net:
+    if args.script_net:
+        ds = {}
+
+        cls = 'vase'
+        ds['train'] = dataset_desc.Dataset('train', cls, DEBUG=False)
+        ds['test'] = dataset_desc.Dataset('test', cls, DEBUG=False)
+        idx = dict(
+            train=0,
+            val=0,
+            test=0
+        )
+
+        for cat in ['train']:
+            datum = ds[cat].__getitem__(idx[cat])
+            idx[cat] += 1
+
+            rndla_cfg = ConfigRandLA
+            model = FFB6D(
+                n_classes=config.n_objects, n_pts=config.n_sample_points, rndla_cfg=rndla_cfg,
+                n_kps=config.n_keypoints
+            )
+
+            print(input)
+            scripted_model = torch.jit.script(model, datum)
+            print(scripted_model.graph)
+
+        return
+
+    elif not args.eval_net:
         train_ds = dataset_desc.Dataset('train', cls_type=args.cls)
         train_sampler = torch.utils.data.distributed.DistributedSampler(train_ds)
         train_loader = torch.utils.data.DataLoader(
@@ -583,6 +614,7 @@ def train():
             val_ds, batch_size=config.val_mini_batch_size, shuffle=False,
             drop_last=False, num_workers=4, sampler=val_sampler
         )
+
     else:
         test_ds = dataset_desc.Dataset('test', cls_type=args.cls)
         test_loader = torch.utils.data.DataLoader(
@@ -618,6 +650,10 @@ def train():
             checkpoint_status = load_checkpoint(
                 model, None, filename=args.checkpoint[:-8]
             )
+        elif args.script_net:
+            checkpoint_status = load_checkpoint(
+                model, None, filename=args.checkpoint[:-8]
+            )
         else:
             checkpoint_status = load_checkpoint(
                 model, optimizer, filename=args.checkpoint[:-8]
@@ -628,18 +664,21 @@ def train():
             assert checkpoint_status is not None, "Failed loadding model."
 
     if not args.eval_net:
-        model = torch.nn.parallel.DistributedDataParallel(
-            model, device_ids=[args.local_rank], output_device=args.local_rank,
-            find_unused_parameters=True
-        )
-        clr_div = 2
-        lr_scheduler = CyclicLR(
-            optimizer, base_lr=1e-5, max_lr=1e-3,
-            cycle_momentum=False,
-            step_size_up=config.n_total_epoch * train_ds.minibatch_per_epoch // clr_div // args.gpus,
-            step_size_down=config.n_total_epoch * train_ds.minibatch_per_epoch // clr_div // args.gpus,
-            mode='triangular'
-        )
+        if not args.script_net:
+            model = torch.nn.parallel.DistributedDataParallel(
+                model, device_ids=[args.local_rank], output_device=args.local_rank,
+                find_unused_parameters=True
+            )
+            clr_div = 2
+            lr_scheduler = CyclicLR(
+                optimizer, base_lr=1e-5, max_lr=1e-3,
+                cycle_momentum=False,
+                step_size_up=config.n_total_epoch * train_ds.minibatch_per_epoch // clr_div // args.gpus,
+                step_size_down=config.n_total_epoch * train_ds.minibatch_per_epoch // clr_div // args.gpus,
+                mode='triangular'
+            )
+        else:
+            lr_scheduler = None
     else:
         lr_scheduler = None
 
@@ -657,6 +696,11 @@ def train():
     if args.eval_net:
         model_fn = model_fn_decorator(
             FocalLoss(gamma=2), OFLoss(),
+            args.test,
+        )
+    elif args.script_net:
+        model_fn = model_fn_decorator(
+            FocalLoss(gamma=2).to(device), OFLoss().to(device),
             args.test,
         )
     else:
@@ -684,6 +728,13 @@ def train():
         )
         end = time.time()
         print("\nUse time: ", end - start, 's')
+    elif args.script_net:
+        for batch in train_loader:
+            batch.to('cuda')
+            model = model.to('cuda')
+            scripted_module = torch.jit.script(model, batch)
+        scripted_module.save("unet.ts")
+        print(scripted_module)
     else:
         trainer.train(
             it, start_epoch, config.n_total_epoch, train_loader, None,

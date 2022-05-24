@@ -16,10 +16,8 @@ import numpy as np
 import pickle as pkl
 from common import Config, ConfigRandLA
 from models.ffb6d import FFB6D
-from datasets.ycb.ycb_dataset import Dataset as YCB_Dataset
-from datasets.linemod.linemod_dataset import Dataset as LM_Dataset
 from datasets.custom.custom_dataset import Dataset as CM_Dataset
-from utils.pvn3d_eval_utils_kpls import cal_frame_poses, cal_frame_poses_lm
+from utils.custom_pvn3d_eval_utils_kpls import cal_frame_poses, cal_frame_poses_custom
 from utils.basic_utils import Basic_Utils
 try:
     from neupeak.utils.webcv2 import imshow, waitKey
@@ -32,7 +30,7 @@ parser.add_argument(
     "-checkpoint", type=str, default=None, help="Checkpoint to eval"
 )
 parser.add_argument(
-    "-dataset", type=str, default="linemod",
+    "-dataset", type=str, default="custom",
     help="Target dataset, ycb or linemod. (linemod as default)."
 )
 parser.add_argument(
@@ -45,10 +43,7 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-if args.dataset == "ycb":
-    config = Config(ds_name=args.dataset)
-else:
-    config = Config(ds_name=args.dataset, cls_type=args.cls)
+config = Config(ds_name=args.dataset, cls_type=args.cls)
 bs_utils = Basic_Utils(config)
 
 
@@ -101,22 +96,14 @@ def cal_view_pred_pose(model, data, epoch=0, obj_id=-1):
         _, classes_rgbd = torch.max(end_points['pred_rgbd_segs'], 1)
 
         pcld = cu_dt['cld_rgb_nrm'][:, :3, :].permute(0, 2, 1).contiguous()
-        if args.dataset == "ycb":
-            pred_cls_ids, pred_pose_lst, _ = cal_frame_poses(
-                pcld[0], classes_rgbd[0], end_points['pred_ctr_ofs'][0],
-                end_points['pred_kp_ofs'][0], True, config.n_objects, True,
-                None, None
-            )
-        else:
-            pred_pose_lst = cal_frame_poses_lm(
-                pcld[0], classes_rgbd[0], end_points['pred_ctr_ofs'][0],
-                end_points['pred_kp_ofs'][0], True, config.n_objects, False, obj_id
-            )
-            pred_cls_ids = np.array([[1]])
+
+        pred_pose_lst = cal_frame_poses_custom(
+            pcld[0], classes_rgbd[0], end_points['pred_ctr_ofs'][0],
+            end_points['pred_kp_ofs'][0], True, config.n_objects, False, obj_id
+        )
+        pred_cls_ids = np.array([[1]])
 
         np_rgb = cu_dt['rgb'].cpu().numpy().astype("uint8")[0].transpose(1, 2, 0).copy()
-        if args.dataset == "ycb":
-            np_rgb = np_rgb[:, :, ::-1].copy()
         ori_rgb = np_rgb.copy()
         for cls_id in cu_dt['cls_ids'][0].cpu().numpy():
             idx = np.where(pred_cls_ids == cls_id)[0]
@@ -127,22 +114,16 @@ def cal_view_pred_pose(model, data, epoch=0, obj_id=-1):
                 obj_id = int(cls_id[0])
             mesh_pts = bs_utils.get_pointxyz(obj_id, ds_type=args.dataset).copy()
             mesh_pts = np.dot(mesh_pts, pose[:, :3].T) + pose[:, 3]
-            if args.dataset == "ycb":
-                K = config.intrinsic_matrix["ycb_K1"]
-            else:
-                K = config.intrinsic_matrix["linemod"]
+            K = config.intrinsic_matrix["custom"]
             mesh_p2ds = bs_utils.project_p3d(mesh_pts, 1.0, K)
             color = bs_utils.get_label_color(obj_id, n_obj=22, mode=2)
             np_rgb = bs_utils.draw_p2ds(np_rgb, mesh_p2ds, color=color)
         vis_dir = os.path.join(config.log_eval_dir, "pose_vis")
         ensure_fd(vis_dir)
         f_pth = os.path.join(vis_dir, "{}.jpg".format(epoch))
-        if args.dataset == 'ycb':
-            bgr = np_rgb
-            ori_bgr = ori_rgb
-        else:
-            bgr = np_rgb[:, :, ::-1]
-            ori_bgr = ori_rgb[:, :, ::-1]
+
+        bgr = np_rgb[:, :, ::-1]
+        ori_bgr = ori_rgb[:, :, ::-1]
         cv2.imwrite(f_pth, bgr)
         if args.show:
             imshow("projected_pose_rgb", bgr)
@@ -154,10 +135,12 @@ def cal_view_pred_pose(model, data, epoch=0, obj_id=-1):
 
 def main():
     test_ds = CM_Dataset('test', cls_type=args.cls)
+    print(test_ds)
+
     obj_id = config.custom_obj_dict[args.cls]
     test_loader = torch.utils.data.DataLoader(
         test_ds, batch_size=config.test_mini_batch_size, shuffle=False,
-        num_workers=16
+        num_workers=4
     )
 
     rndla_cfg = ConfigRandLA

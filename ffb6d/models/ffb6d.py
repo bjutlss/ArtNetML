@@ -199,7 +199,7 @@ class FFB6D(nn.Module):
         return xyz, features
 
     def forward(
-        self, inputs, end_points=None, scale=1,
+        self, inputs, end_points=List[Tensor], scale=1,
     ):
         """
         Params:
@@ -214,6 +214,7 @@ class FFB6D(nn.Module):
             end_points:
         """
         # ###################### prepare stages #############################
+
         if not end_points:
             end_points = {}
         # ResNet pre + layer1 + layer2
@@ -226,7 +227,7 @@ class FFB6D(nn.Module):
 
         # ###################### encoding stages #############################
         ds_emb = []
-        for i_ds in range(4):
+        for i_ds in range(int(4)):
             # encode rgb downsampled feature
             rgb_emb0 = self.cnn_ds_stages[i_ds](rgb_emb)
             bs, c, hr, wr = rgb_emb0.size()
@@ -237,7 +238,7 @@ class FFB6D(nn.Module):
             )
             f_sampled_i = self.random_sample(f_encoder_i, inputs['cld_sub_idx%d' % i_ds])
             p_emb0 = f_sampled_i
-            if i_ds == 0:
+            if i_ds == int(0):
                 ds_emb.append(f_encoder_i)
 
             # fuse point feauture to rgb feature
@@ -262,7 +263,7 @@ class FFB6D(nn.Module):
 
         # ###################### decoding stages #############################
         n_up_layers = len(self.rndla_up_stages)
-        for i_up in range(n_up_layers-1):
+        for i_up in range(int(n_up_layers-1)):
             # decode rgb upsampled feature
             rgb_emb0 = self.cnn_up_stages[i_up](rgb_emb)
             bs, c, hr, wr = rgb_emb0.size()
@@ -370,7 +371,7 @@ def main():
 
     n_cls = 3
     model = FFB6D(n_cls, rndla_cfg.num_points, rndla_cfg)
-    print(model)
+    #print(model)
     #ffb6d_scripted =torch.jit.script(model)
 
 
