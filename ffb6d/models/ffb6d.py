@@ -21,7 +21,7 @@ class FFB6D(nn.Module):
         self.n_cls = n_classes
         self.n_pts = n_pts
         self.n_kps = n_kps
-        cnn = psp_models['resnet18'.lower()]()
+        cnn = psp_models['resnet34'.lower()]()
 
         rndla = RandLANet(rndla_cfg)
 
@@ -32,7 +32,7 @@ class FFB6D(nn.Module):
         )
         self.rndla_pre_stages = rndla.fc0
 
-        # ####################### downsample stages#######################
+        # ####################### downsample stages #######################
         self.cnn_ds_stages = nn.ModuleList([
             cnn.feats.layer1,    # stride = 1, [bs, 64, 120, 160]
             cnn.feats.layer2,    # stride = 2, [bs, 128, 60, 80]
@@ -50,6 +50,7 @@ class FFB6D(nn.Module):
         self.ds_fuse_r2p_fuse_layers = nn.ModuleList()
         self.ds_fuse_p2r_pre_layers = nn.ModuleList()
         self.ds_fuse_p2r_fuse_layers = nn.ModuleList()
+
         for i in range(4):
             self.ds_fuse_r2p_pre_layers.append(
                 pt_utils.Conv2d(
