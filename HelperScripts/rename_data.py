@@ -12,7 +12,8 @@ count = int(sys.argv[2])
 
 jpg_files = sorted(glob.glob(path+"*.jpg"))
 png_files = sorted(glob.glob(path+"*.png"))
-
+if not png_files:
+    png_files = sorted(glob.glob(path+"*.PNG"))
 
 for jpg_file in jpg_files:
     if len(str(count))==1:
@@ -31,14 +32,15 @@ for jpg_file in jpg_files:
 
 for png_file in png_files:
     if len(str(count))==1:
-        os.rename(png_file, path+"00000"+str(count)+".png")
-        count += 1
-    elif len(str(count))==2:
-        os.rename(png_file, path+"0000"+str(count)+".png")
-        count += 1
-    elif len(str(count))==3:
         os.rename(png_file, path+"000"+str(count)+".png")
         count += 1
-    else:
+    elif len(str(count))==2:
         os.rename(png_file, path+"00"+str(count)+".png")
         count += 1
+    elif len(str(count))==3:
+        os.rename(png_file, path+"0"+str(count)+".png")
+        count += 1
+    else:
+        os.rename(png_file, path+""+str(count)+".png")
+        count += 1
+    print("renamed " + str(png_file))

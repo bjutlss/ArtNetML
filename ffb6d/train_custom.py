@@ -18,6 +18,7 @@ from collections import namedtuple
 from cv2 import imshow, waitKey
 
 import torch
+from torch.cuda import Event
 import torch.optim as optim
 import torch.optim.lr_scheduler as lr_sched
 import torch.nn as nn
@@ -674,12 +675,15 @@ def train():
     )
 
     if args.eval_net:
-        start = time.time()
+        start = torch.cuda.Event(enable_timing=True)
+        end = torch.cuda.Event(enable_timing=True)
+        start.record()
         val_loss, res = trainer.eval_epoch(
             test_loader, is_test=True, test_pose=args.test_pose
         )
-        end = time.time()
-        print("\nUse time: ", end - start, 's')
+        end.record()
+        print("\nUse time: ", start.elapsed_time(end), 's')
+
     else:
         trainer.train(
             it, start_epoch, config.n_total_epoch, train_loader, None,
