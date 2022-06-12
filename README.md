@@ -1,4 +1,4 @@
-# FFB6D
+# ARtNet - An FFB6D Version with custom dataset for iPad
 This is an unofficial source code and a modified version of **FFB6D: A Full Flow Biderectional Fusion Network for 6D Pose Estimation**. ([Arxiv](https://arxiv.org/abs/2103.02242), [Video_Bilibili](https://www.bilibili.com/video/BV1YU4y1a7Kp?from=search&seid=8306279574921937158), [Video_YouTube](https://www.youtube.com/watch?v=SSi2TnyD6Is))
 
 
