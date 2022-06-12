@@ -6,8 +6,13 @@ import numpy as np
 
 path = sys.argv[1]
 png_files = sorted(glob.glob(path+"*.png"))
+<<<<<<< HEAD
 new_path = path
 print(png_files)
+=======
+new_path = path+"multiplied/"
+
+>>>>>>> f5ca5e185fea8b589c42efac2b3e93361219d72f
 for png in png_files:
     img_data = img.open(str(png), "r")
     img_arr = np.array(img_data)
@@ -18,4 +23,7 @@ for png in png_files:
     filename = png.split("/")[-1]
     new_img = img.fromarray(new_arr)
     new_img.save(str(new_path)+str(filename))
+<<<<<<< HEAD
     print("Saved "+filename+" as clamped png")
+=======
+>>>>>>> f5ca5e185fea8b589c42efac2b3e93361219d72f
