@@ -584,7 +584,7 @@ def train():
         test_ds = dataset_desc.Dataset('test', cls_type=args.cls)
         test_loader = torch.utils.data.DataLoader(
             test_ds, batch_size=config.test_mini_batch_size, shuffle=False,
-            num_workers=10
+            num_workers=1
         )
 
     rndla_cfg = ConfigRandLA
@@ -675,14 +675,14 @@ def train():
     )
 
     if args.eval_net:
-        start = torch.cuda.Event(enable_timing=True)
-        end = torch.cuda.Event(enable_timing=True)
-        start.record()
+        #start = torch.cuda.Event(enable_timing=True)
+        #end = torch.cuda.Event(enable_timing=True)
+        #start.record()
         val_loss, res = trainer.eval_epoch(
             test_loader, is_test=True, test_pose=args.test_pose
         )
-        end.record()
-        print("\nUse time: ", start.elapsed_time(end), 's')
+        #end.record()
+        #print("\nUse time: ", start.elapsed_time(end), 's')
 
     else:
         trainer.train(

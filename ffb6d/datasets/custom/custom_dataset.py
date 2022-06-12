@@ -446,6 +446,7 @@ class Dataset():
             return data
         else:
             item_name = self.all_lst[idx]
+            print(item_name)
             return self.get_item(item_name)
 
 

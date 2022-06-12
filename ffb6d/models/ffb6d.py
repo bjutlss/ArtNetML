@@ -14,25 +14,27 @@ psp_models = {
 
 
 class FFB6D(nn.Module):
-    def __init__(self, n_classes, n_pts, rndla_cfg, n_kps=8):
+    def __init__(
+        self, n_classes, n_pts, rndla_cfg, n_kps=8
+    ):
         super().__init__()
 
         # ######################## prepare stages#########################
         self.n_cls = n_classes
         self.n_pts = n_pts
         self.n_kps = n_kps
-        cnn = psp_models['resnet34'.lower()]()
+        cnn = psp_models['resnet18'.lower()]()
 
         rndla = RandLANet(rndla_cfg)
 
-        self.cnn_pre_stages = nn.Sequential (
+        self.cnn_pre_stages = nn.Sequential(
             cnn.feats.conv1,  # stride = 2, [bs, c, 240, 320]
             cnn.feats.bn1, cnn.feats.relu,
             cnn.feats.maxpool  # stride = 2, [bs, 64, 120, 160]
         )
         self.rndla_pre_stages = rndla.fc0
 
-        # ####################### downsample stages #######################
+        # ####################### downsample stages#######################
         self.cnn_ds_stages = nn.ModuleList([
             cnn.feats.layer1,    # stride = 1, [bs, 64, 120, 160]
             cnn.feats.layer2,    # stride = 2, [bs, 128, 60, 80]
@@ -50,7 +52,6 @@ class FFB6D(nn.Module):
         self.ds_fuse_r2p_fuse_layers = nn.ModuleList()
         self.ds_fuse_p2r_pre_layers = nn.ModuleList()
         self.ds_fuse_p2r_fuse_layers = nn.ModuleList()
-
         for i in range(4):
             self.ds_fuse_r2p_pre_layers.append(
                 pt_utils.Conv2d(
@@ -369,16 +370,13 @@ def main():
     from common import ConfigRandLA
     rndla_cfg = ConfigRandLA
 
-    n_cls = 3
+    n_cls = 22
     model = FFB6D(n_cls, rndla_cfg.num_points, rndla_cfg)
     print(model)
-    #ffb6d_scripted =torch.jit.script(model)
-
 
     print(
         "model parameters:", sum(param.numel() for param in model.parameters())
     )
-
 
 if __name__ == "__main__":
     main()
