@@ -675,14 +675,9 @@ def train():
     )
 
     if args.eval_net:
-        #start = torch.cuda.Event(enable_timing=True)
-        #end = torch.cuda.Event(enable_timing=True)
-        #start.record()
         val_loss, res = trainer.eval_epoch(
             test_loader, is_test=True, test_pose=args.test_pose
         )
-        #end.record()
-        #print("\nUse time: ", start.elapsed_time(end), 's')
 
     else:
         trainer.train(

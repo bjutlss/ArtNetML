@@ -455,7 +455,7 @@ def main():
     ds = {}
     cls = 'vase'
     ds['train'] = Dataset('train', cls, DEBUG=True)
-    ds['test'] = Dataset('test', cls, DEBUG=False)
+    ds['test'] = Dataset('test', cls, DEBUG=True)
     idx = dict(
         train=0,
         val=0,
@@ -486,8 +486,7 @@ def main():
                 rgb = ds[cat].bs_utils.draw_p2ds(
                     rgb, ctr_2ds, 4, (0, 0, 255)
                 )
-            imS = cv2.resize(rgb, (720,960))
-            imshow('{}_rgb'.format(cat), imS)
+            imshow('{}_rgb'.format(cat), rgb)
             cmd = waitKey(0)
             if cmd == ord('q'):
                 exit()

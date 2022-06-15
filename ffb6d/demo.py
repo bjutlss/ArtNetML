@@ -6,6 +6,7 @@ from __future__ import (
     print_function,
     unicode_literals,
 )
+from prettytable import PrettyTable as pt
 import os
 import tqdm
 import cv2
@@ -16,6 +17,7 @@ import numpy as np
 import pickle as pkl
 from common import Config, ConfigRandLA
 from models.ffb6d import FFB6D
+from torchsummary import summary
 
 from datasets.custom.custom_dataset import Dataset as CM_Dataset
 from utils.custom_pvn3d_eval_utils_kpls import cal_frame_poses, cal_frame_poses_custom
@@ -96,7 +98,6 @@ def cal_view_pred_pose(model, data, epoch=0, obj_id=-1):
         _, classes_rgbd = torch.max(end_points['pred_rgbd_segs'], 1)
 
         pcld = cu_dt['cld_rgb_nrm'][:, :3, :].permute(0, 2, 1).contiguous()
-
         pred_pose_lst = cal_frame_poses_custom(
             pcld[0], classes_rgbd[0], end_points['pred_ctr_ofs'][0],
             end_points['pred_kp_ofs'][0], True, config.n_objects, False, obj_id
@@ -142,25 +143,35 @@ def main():
         test_ds, batch_size=config.test_mini_batch_size, shuffle=False,
         num_workers=16
     )
-
     rndla_cfg = ConfigRandLA
     model = FFB6D(
         n_classes=config.n_objects, n_pts=config.n_sample_points, rndla_cfg=rndla_cfg,
         n_kps=config.n_keypoints
     )
     model.cuda()
+    # count_parameters(model)
 
     # load status from checkpoint
     if args.checkpoint is not None:
         load_checkpoint(
             model, None, filename=args.checkpoint[:-8]
         )
-
     for i, data in tqdm.tqdm(
         enumerate(test_loader), leave=False, desc="val"
     ):
         cal_view_pred_pose(model, data, epoch=i, obj_id=obj_id)
 
+def count_parameters(model):
+    table = pt(["Modules", "Parameters"])
+    total_params = 0
+    for name, parameter in model.named_parameters():
+        if not parameter.requires_grad: continue
+        params = parameter.numel()
+        table.add_row([name, params])
+        total_params+=params
+    print(table)
+    print(f"Total Trainable Params: {total_params}")
+    return total_params
 
 if __name__ == "__main__":
     main()
