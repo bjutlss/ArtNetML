@@ -21,7 +21,7 @@ year = {2020}
 ```
 
 ## Installation
-- Install CUDA >= 10.2
+- Install nvidia drive3r version compatible with cuda toolkit >= 10.2 
 - Install conda environment:
   ```shell
   pip install conda
@@ -30,7 +30,7 @@ year = {2020}
   conda create ––name ffb6d python=3.6
   conda activate ffb6d
   ```
-- Install requirements.txt in conda with mamba:
+- Install requirements.txt and Cuda Toolkit GPU with conda & mamba:
   ```shell
   conda install -c menpo opencv3
   conda install mamba
