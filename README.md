@@ -21,24 +21,36 @@ year = {2020}
 ```
 
 ## Installation
-- Install CUDA 10.1 / 10.2
-- Set up python3 environment from requirement.txt:
+- Install CUDA >= 10.2
+- Install conda environment:
   ```shell
-  pip3 install -r requirement.txt 
+  pip install conda
+  conda config --add channels conda-forge
+  conda config --add channels ramonaoptics
+  conda create ––name ffb6d python=3.6
+  conda activate ffb6d
+  ```
+- Install requirements.txt in conda with mamba:
+  ```shell
+  conda install -c menpo opencv3
+  conda install mamba
+  mamba install pytorch torchvision cudatoolkit=11.3 -c pytorch
+  cat requirement.txt | xargs -n 1 mamba install
+  pip install "pybind11[global]"
   ```
 - Install [apex](https://github.com/NVIDIA/apex):
   ```shell
   git clone https://github.com/NVIDIA/apex
   cd apex
   export TORCH_CUDA_ARCH_LIST="6.0;6.1;6.2;7.0;7.5"  # set the target architecture manually, suggested in issue https://github.com/NVIDIA/apex/issues/605#issuecomment-554453001
-  pip3 install -v --disable-pip-version-check --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" ./
+  pip install -v --disable-pip-version-check --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" ./
   cd ..
   ```
 - Install [normalSpeed](https://github.com/hfutcgncas/normalSpeed), a fast and light-weight normal map estimator:
   ```shell
   git clone https://github.com/hfutcgncas/normalSpeed.git
   cd normalSpeed/normalSpeed
-  python3 setup.py install --user
+  python setup.py install --user
   cd ..
   ```
 - Install tkinter through ``sudo apt install python3-tk``
